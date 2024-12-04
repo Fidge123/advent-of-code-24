@@ -21,88 +21,30 @@ function part1(input: string) {
 function countXmas(input: string[], line: number, char: number): number {
   let count = 0;
   if (input[line][char] === "X") {
-    if (input[line + 1]?.[char] === "M") {
-      if (input[line + 2]?.[char] === "A") {
-        if (input[line + 3]?.[char] === "S") {
-          console.log(
-            `Found XMAS at line ${line + 1} char ${char + 1} going south.`
-          );
-          count += 1;
-        }
-      }
-    }
-    if (input[line - 1]?.[char] === "M") {
-      if (input[line - 2]?.[char] === "A") {
-        if (input[line - 3]?.[char] === "S") {
-          console.log(
-            `Found XMAS at line ${line + 1} char ${char + 1} going north.`
-          );
-          count += 1;
-        }
-      }
-    }
-    if (input[line + 1]?.[char + 1] === "M") {
-      if (input[line + 2]?.[char + 2] === "A") {
-        if (input[line + 3]?.[char + 3] === "S") {
-          console.log(
-            `Found XMAS at line ${line + 1} char ${char + 1} going south east.`
-          );
-          count += 1;
-        }
-      }
-    }
-    if (input[line + 1]?.[char - 1] === "M") {
-      if (input[line + 2]?.[char - 2] === "A") {
-        if (input[line + 3]?.[char - 3] === "S") {
-          console.log(
-            `Found XMAS at line ${line + 1} char ${char + 1} going south west.`
-          );
-          count += 1;
-        }
-      }
-    }
-    if (input[line - 1]?.[char + 1] === "M") {
-      if (input[line - 2]?.[char + 2] === "A") {
-        if (input[line - 3]?.[char + 3] === "S") {
-          console.log(
-            `Found XMAS at line ${line + 1} char ${char + 1} going north east.`
-          );
-          count += 1;
-        }
-      }
-    }
-    if (input[line - 1]?.[char - 1] === "M") {
-      if (input[line - 2]?.[char - 2] === "A") {
-        if (input[line - 3]?.[char - 3] === "S") {
-          console.log(
-            `Found XMAS at line ${line + 1} char ${char + 1} going north west.`
-          );
-          count += 1;
-        }
-      }
-    }
-    if (input[line]?.[char + 1] === "M") {
-      if (input[line]?.[char + 2] === "A") {
-        if (input[line]?.[char + 3] === "S") {
-          console.log(
-            `Found XMAS at line ${line + 1} char ${char + 1} going east.`
-          );
-          count += 1;
-        }
-      }
-    }
-    if (input[line]?.[char - 1] === "M") {
-      if (input[line]?.[char - 2] === "A") {
-        if (input[line]?.[char - 3] === "S") {
-          console.log(
-            `Found XMAS at line ${line + 1} char ${char + 1} going west.`
-          );
-          count += 1;
-        }
-      }
-    }
+    checkDirection(input, line, 1, char, 0); // south
+    checkDirection(input, line, -1, char, 0); // north
+    checkDirection(input, line, 0, char, 1); // east
+    checkDirection(input, line, 0, char, -1); // west
+    checkDirection(input, line, 1, char, 1); // SE
+    checkDirection(input, line, 1, char, -1); // SW
+    checkDirection(input, line, -1, char, 1); // NE
+    checkDirection(input, line, -1, char, -1); // NW
   }
   return count;
+}
+
+function checkDirection(
+  input: string[],
+  line: number,
+  lineMultiplier: number,
+  char: number,
+  charMultiplier: number
+): number {
+  const hasXmas =
+    input[line + 1 * lineMultiplier]?.[char + 1 * charMultiplier] === "M" &&
+    input[line + 2 * lineMultiplier]?.[char + 2 * charMultiplier] === "A" &&
+    input[line + 3 * lineMultiplier]?.[char + 3 * charMultiplier] === "S";
+  return hasXmas ? 1 : 0;
 }
 
 function part2(input: string) {
@@ -125,9 +67,6 @@ function countMas(input: string[], line: number, char: number): number {
       input[line - 1]?.[char + 1] === "S" &&
       input[line - 1]?.[char - 1] === "S"
     ) {
-      console.log(
-        `Found X-MAS at line ${line + 1} char ${char + 1} facing south.`
-      );
       count += 1;
     }
     if (
@@ -136,9 +75,6 @@ function countMas(input: string[], line: number, char: number): number {
       input[line + 1]?.[char + 1] === "S" &&
       input[line + 1]?.[char - 1] === "S"
     ) {
-      console.log(
-        `Found X-MAS at line ${line + 1} char ${char + 1} facing north.`
-      );
       count += 1;
     }
     if (
@@ -147,9 +83,6 @@ function countMas(input: string[], line: number, char: number): number {
       input[line + 1]?.[char + 1] === "S" &&
       input[line - 1]?.[char + 1] === "S"
     ) {
-      console.log(
-        `Found X-MAS at line ${line + 1} char ${char + 1} facing west.`
-      );
       count += 1;
     }
     if (
@@ -158,9 +91,6 @@ function countMas(input: string[], line: number, char: number): number {
       input[line + 1]?.[char - 1] === "S" &&
       input[line - 1]?.[char - 1] === "S"
     ) {
-      console.log(
-        `Found X-MAS at line ${line + 1} char ${char + 1} facing east.`
-      );
       count += 1;
     }
   }
