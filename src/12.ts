@@ -8,16 +8,12 @@ const client = new AocClient({
 });
 
 type Coordinates = [number, number];
-type Region = Coordinates[];
 type RegionsList = Region[];
+type Region = Coordinates[];
 
 function part1(input: string) {
   const map = input.split("\n").map((row) => row.split(""));
   const regions = getRegions(map);
-  // for (const region of regions) {
-  //   const [x, y] = region[0];
-  //   console.log(map[x][y], JSON.stringify(region));
-  // }
 
   return regions.reduce((sum, region) => sum + getPrice(region, false), 0);
 }
@@ -62,6 +58,10 @@ function isNextTo(a: Coordinates, b: Coordinates) {
   return false;
 }
 
+function isDiagonal(a: Coordinates, b: Coordinates) {
+  return Math.abs(a[0] - b[0]) === 1 && Math.abs(a[1] - b[1]) === 1;
+}
+
 function getPrice(region: Region, applyDiscount: boolean): number {
   const area = region.length;
   let perimeter = 0;
@@ -72,43 +72,47 @@ function getPrice(region: Region, applyDiscount: boolean): number {
   return area * (applyDiscount ? getDiscount(region) : perimeter);
 }
 
+function getDiscount(region: Region): number {
+  let corners = 0;
+  for (const tile of region) {
+    const neighbors = region.filter((t) => isNextTo(t, tile));
+    const diagonals = region.filter((t) => isDiagonal(t, tile));
+    if (neighbors.length === 0) {
+      corners += 4;
+    }
+    if (neighbors.length === 1) {
+      corners += 2;
+    }
+    if (neighbors.length === 2) {
+      if (
+        neighbors[0][0] !== neighbors[1][0] &&
+        neighbors[0][1] !== neighbors[1][1]
+      ) {
+        const onlyOutsideCorner = diagonals.some(
+          (d) => isNextTo(d, neighbors[0]) && isNextTo(d, neighbors[1])
+        );
+        corners += onlyOutsideCorner ? 1 : 2;
+      }
+    }
+    if (neighbors.length === 3) {
+      const outsideCorners = diagonals.filter(
+        (d) => neighbors.filter((n) => isNextTo(d, n)).length == 2
+      );
+      corners += 2 - outsideCorners.length;
+    }
+    if (neighbors.length === 4) {
+      corners += 4 - diagonals.length;
+    }
+  }
+
+  return corners;
+}
+
 function part2(input: string) {
   const map = input.split("\n").map((row) => row.split(""));
   const regions = getRegions(map);
 
   return regions.reduce((sum, region) => sum + getPrice(region, true), 0);
 }
-
-function getDiscount(region: Region): number {
-  const sides = [] as string[];
-
-  for (const plot of region) {
-    const adjacent = region.filter(r => isNextTo(r, plot));
-    const [left, right, top, bottom] = [
-      `c${plot[1]}`,
-      `c${plot[1] + 1}`,
-      `r${plot[0]}`,
-      `r${plot[0] + 1}`,
-    ];
-    if (!sides.includes(left)) {
-      if (!adjacent.filter())
-    }
-    sides.push(plot[0])
-  }
-  return sides;
-}
-
-console.log(
-  part2(`RRRRIICCFF
-RRRRIICCCF
-VVRRRCCFFF
-VVRCCCJFFF
-VVVVCJJCFE
-VVIVCCJJEE
-VVIIICJJEE
-MIIIIIJJEE
-MIIISIJEEE
-MMMISSJEEE`)
-);
 
 await client.run([part1 as PartFn, part2 as PartFn], false);
